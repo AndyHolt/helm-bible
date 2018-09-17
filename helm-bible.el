@@ -66,7 +66,7 @@ that will be displayed in the helm interface.
 TODO: Make display more useful, include the text of the verse in
 the display.  And prettify the formatting so that the columns of
 book name, chapter number, verse number etc line up."
-  (cdr (assoc 'name verse)))
+  (concat (cdr (assoc 'name verse)) " " (cdr (assoc 'esv-text verse))))
 
 
 (defun helm-bible-search ()
