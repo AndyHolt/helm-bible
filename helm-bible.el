@@ -19,25 +19,6 @@
 ;; (format "%s %s")
 
 
-(length bible-verses)
-
-(cdr (assoc 'verse (car (cdr bible-verses))))
-
-(rassoc "1" (car bible-verses))
-
-(alist-get 'name (car bible-verses))
-
-(assoc 'verse (car bible-verses))
-
-(mapcar (lambda (verse)
-          (cdr (assoc 'verse verse)))
-        bible-verses)
-
-(car (cdr bible-verses))
-
-(nth 1 bible-verses)
-
-
 ;;; code:
 
 (require 'helm)
