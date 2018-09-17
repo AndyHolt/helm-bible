@@ -50,7 +50,12 @@ book name, chapter number, verse number etc line up."
 
 
 (defun helm-bible-search ()
-    "Create candidates list for helm-bible"
+    "Create candidates list for helm-bible.
+
+Returns a list of pairs, with the car of each as the display, and
+the cdr as the whole verse data structure.
+This function is used by in defining `helm-source-bible' to provide the list of
+candidates."
     (mapcar (lambda (verse)
               (cons (helm-bible-format-verse-for-display verse)
                     verse))
