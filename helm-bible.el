@@ -82,18 +82,9 @@ book name, chapter number, verse number etc line up."
 
 
 (defvar helm-source-bible
-  '((name . "Bible")
-    (candidates . helm-bible-search)
-    (action . (("Display verse" . helm-bible-display-verse)))
-    ))
-
-(setq helm-source-bible
-  '((name . "Bible")
-    (candidates . helm-bible-search)
-    (action . (("Display verse" . helm-bible-display-verse)))
-    (filtered-candidate-trasnformer helm-bible-search helm-fuzzy-highlight-matches)
-    (multimatch)
-    (fuzzy-match)
-    ))
+      (helm-build-sync-source "Bible"
+        :candidates (helm-bible-search)
+        :action (helm-make-actions
+                 "Display verse" 'helm-bible-display-verse)))
 
 (helm :sources '(helm-source-bible))
