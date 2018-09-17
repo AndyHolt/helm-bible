@@ -76,4 +76,8 @@ candidates."
         :action helm-bible-actions)
       "Create the primary bible search source.")
 
-(helm :sources '(helm-source-bible))
+(helm :sources '(helm-source-bible)
+      :buffer "*helm bible*")
+
+(provide 'helm-bible)
+;;; helm-bible ends here
