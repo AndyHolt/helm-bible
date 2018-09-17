@@ -65,11 +65,15 @@ candidates."
   "An action to display the text of VERSE in the mini-buffer."
   (message (cdr (assoc 'esv-text verse))))
 
+(defvar helm-bible-actions
+  (helm-make-actions
+   "Display verse" 'helm-bible-display-verse)
+  "Create the actions for helm-bible.")
 
 (defvar helm-source-bible
       (helm-build-sync-source "Bible"
         :candidates (helm-bible-search)
-        :action (helm-make-actions
-                 "Display verse" 'helm-bible-display-verse)))
+        :action helm-bible-actions)
+      "Create the primary bible search source.")
 
 (helm :sources '(helm-source-bible))
