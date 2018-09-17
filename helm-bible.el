@@ -35,8 +35,7 @@
      (book . "Genesis")
      (chapter . "1")
      (verse . "2")
-     (esv-text . "The earth was without form and void, and darkness was over the face of the deep"))
-  ))
+     (esv-text . "The earth was without form and void, and darkness was over the face of the deep"))))
 
 (defun helm-bible-format-verse-for-display (verse)
   "Format VERSE for display in helm selection.
