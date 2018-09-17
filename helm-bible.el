@@ -91,6 +91,9 @@ book name, chapter number, verse number etc line up."
   '((name . "Bible")
     (candidates . helm-bible-search)
     (action . (("Display verse" . helm-bible-display-verse)))
+    (filtered-candidate-trasnformer helm-bible-search helm-fuzzy-highlight-matches)
+    (multimatch)
+    (fuzzy-match)
     ))
 
 (helm :sources '(helm-source-bible))
