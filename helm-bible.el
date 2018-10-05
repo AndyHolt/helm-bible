@@ -46,7 +46,6 @@
           (cons 'verse (match-string 3 line))
           (cons 'esv-text (match-string 4 line))))
 
-
 (defun helm-bible-get-bible-verses ()
   "Get a list of assoc lists of all bible verses."
   (mapcar 'helm-bible-text-to-assoc-list-2
