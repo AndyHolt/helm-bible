@@ -37,6 +37,24 @@
      (verse . "2")
      (esv-text . "The earth was without form and void, and darkness was over the face of the deep"))))
 
+(defun helm-bible-text-to-assoc-list (line)
+    "Take the LINE from text file and return assoc list of data."
+    (string-match "\\([A-Za-z0-9 ]+\\) \\([0-9]+\\):\\([0-9]+\\): \\(.*\\)" line)
+    (list (cons 'name (substring line (match-beginning 1) (match-end 3)))
+          (cons 'book (match-string 1 line))
+          (cons 'chapter (match-string 2 line))
+          (cons 'verse (match-string 3 line))
+          (cons 'esv-text (match-string 4 line))))
+
+
+(defun helm-bible-get-bible-verses ()
+  "Get a list of assoc lists of all bible verses."
+  (mapcar 'helm-bible-text-to-assoc-list-2
+          (with-temp-buffer
+            (insert-file-contents "~/Bible/helm-bible/ESV/01Genesis01")
+            (split-string (buffer-string) "\n" t))))
+
+
 (defun helm-bible-format-verse-for-display (verse)
   "Format VERSE for display in helm selection.
 
@@ -59,7 +77,7 @@ candidates."
     (mapcar (lambda (verse)
               (cons (helm-bible-format-verse-for-display verse)
                     verse))
-            bible-verses))
+            (helm-bible-get-bible-verses)))
 
 (defun helm-bible-display-verse (verse)
   "An action to display the text of VERSE in the mini-buffer."
