@@ -1,25 +1,26 @@
-;; could produce json version of bible text, which would allow use of the json
-;; library, might be quite a neat way to do it
-;;
-;; json data structure like
-;; book:
-;; chapter:
-;; verse:
-;; esv-text:
-;; niv-text:
-;; sbl-text:
-;; nlt-text:
-;; etc
+;;; helm-bible.el --- bible search and other tools in helm
 
-;; helm-pattern is the current entry to the helm search box, entered by the
-;; user. Dynamic variable.
+;; Author: Andy Holt <andrew.holt@hotmail.co.uk>
+;; Version: 0.1
 
-;; function to format the track for display, which sets the name of the
-;; candidate for display in helm, can be made up of various elements
-;; (format "%s %s")
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
 
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
 
-;;; code:
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; A bible search tool for Emacs, based on Helm.
+
+;;; Code:
 
 (require 'helm)
 
