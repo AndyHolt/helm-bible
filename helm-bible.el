@@ -94,8 +94,13 @@ candidates."
         :action helm-bible-actions)
       "Create the primary bible search source.")
 
-(helm :sources '(helm-source-bible)
-      :buffer "*helm bible*")
+(defun helm-bible ()
+  "Search the Bible."
+  (interactive)
+  (helm :sources '(helm-source-bible)
+        :buffer "*helm bible*"))
+
+(global-set-key (kbd "C-c m g") 'helm-bible)
 
 (provide 'helm-bible)
 ;;; helm-bible ends here
