@@ -48,7 +48,7 @@
 
 (defun helm-bible-get-bible-verses ()
   "Get a list of assoc lists of all bible verses."
-  (mapcar 'helm-bible-text-to-assoc-list-2
+  (mapcar 'helm-bible-text-to-assoc-list
           (with-temp-buffer
             (insert-file-contents "~/Bible/helm-bible/ESV/01Genesis01")
             (split-string (buffer-string) "\n" t))))
