@@ -65,13 +65,42 @@ candidates."
                     verse))
             (helm-bible-get-bible-verses)))
 
-(defun helm-bible-display-verse (verse)
+(defun helm-bible-action-display-verse (verse)
   "An action to display the text of VERSE in the mini-buffer."
   (message (cdr (assoc 'esv-text verse))))
 
+(defun helm-bible-action-insert-verse-text (verse)
+  "Insert the text of the selected Bible verse at point."
+  (insert (cdr (assoc 'esv-text verse))))
+
+(defun helm-bible-action-insert-reference (verse)
+  "Insert the reference of the selected Bible verse at point."
+  (insert (cdr (assoc 'name verse))))
+
+(defun helm-bible-action-insert-verse-with-reference (verse)
+  "Insert the text of the selected Bible verse at point, with a reference."
+  (insert (concat (cdr (assoc 'esv-text verse))
+                  " ("
+                  (cdr (assoc 'name verse))
+                  ")")))
+
+(defun helm-bible-action-goto-notes (verse)
+  "Go to notes file and location for notes on that verse."
+  (find-file (format "~/Documents/BibleNotes/%s.org"
+                     (replace-regexp-in-string " " ""
+                                               (cdr (assoc 'book verse)))))
+  (goto-char (point-min))
+  (re-search-forward (format "^\* %s %s"
+                             (cdr (assoc 'book verse))
+                             (cdr (assoc 'chapter verse)))))
+
 (defvar helm-bible-actions
   (helm-make-actions
-   "Display verse" 'helm-bible-display-verse)
+   "Display verse" 'helm-bible-action-display-verse
+   "Insert verse (text only)" 'helm-bible-action-insert-verse-text
+   "Insert verse reference" 'helm-bible-action-insert-reference
+   "Insert verse with reference" 'helm-bible-action-insert-verse-with-reference
+   "Goto notes" 'helm-bible-action-goto-notes)
   "Create the actions for helm-bible.")
 
 (defvar helm-source-bible
