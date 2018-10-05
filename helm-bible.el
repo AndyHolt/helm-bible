@@ -50,7 +50,7 @@
   "Get a list of assoc lists of all bible verses."
   (mapcar 'helm-bible-text-to-assoc-list
           (with-temp-buffer
-            (insert-file-contents "~/Bible/helm-bible/ESV/01Genesis01")
+            (insert-file-contents "~/Bible/helm-bible/esv-bible-text.txt")
             (split-string (buffer-string) "\n" t))))
 
 
