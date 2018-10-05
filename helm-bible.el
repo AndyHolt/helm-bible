@@ -24,20 +24,6 @@
 
 (require 'helm)
 
-;; set up some dummy data
-;; need to find a way to get the real data in
-(defvar bible-verses
-  '(((name . "Genesis 1:1")
-     (book . "Genesis")
-     (chapter . "1")
-     (verse . "1")
-     (esv-text . "In the beginning, God created the heavens and the earth."))
-    ((name . "Genesis 1:2")
-     (book . "Genesis")
-     (chapter . "1")
-     (verse . "2")
-     (esv-text . "The earth was without form and void, and darkness was over the face of the deep"))))
-
 (defun helm-bible-text-to-assoc-list (line)
     "Take the LINE from text file and return assoc list of data."
     (string-match "\\([A-Za-z0-9 ]+\\) \\([0-9]+\\):\\([0-9]+\\): \\(.*\\)" line)
