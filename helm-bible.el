@@ -115,7 +115,5 @@ candidates."
   (helm :sources '(helm-source-bible)
         :buffer "*helm bible*"))
 
-(global-set-key (kbd "C-c m g") 'helm-bible)
-
 (provide 'helm-bible)
 ;;; helm-bible ends here
