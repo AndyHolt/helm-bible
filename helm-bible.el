@@ -67,11 +67,17 @@ candidates."
 
 (defun helm-bible-action-display-verse (verse)
   "An action to display the text of VERSE in the mini-buffer."
-  (message (cdr (assoc 'esv-text verse))))
+  (message (mapconcat 'identity (mapcar (lambda (this-verse)
+                                          (cdr (assoc 'esv-text this-verse)))
+                                        (helm-marked-candidates))
+                      " ")))
 
 (defun helm-bible-action-insert-verse-text (verse)
   "Insert the text of the selected Bible verse at point."
-  (insert (cdr (assoc 'esv-text verse))))
+  (insert (mapconcat 'identity (mapcar (lambda (this-verse)
+                                         (cdr (assoc 'esv-text this-verse)))
+                                       (helm-marked-candidates))
+                     " ")))
 
 (defun helm-bible-action-insert-reference (verse)
   "Insert the reference of the selected Bible verse at point."
