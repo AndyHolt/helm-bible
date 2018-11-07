@@ -105,13 +105,29 @@ candidates."
                              (cdr (assoc 'book verse))
                              (cdr (assoc 'chapter verse)))))
 
+(defun helm-bible-action-create-buffer (verse)
+  "Make a notes buffer (org-mode) with the selected candidates."
+  (switch-to-buffer "bible-search.org")
+  (insert (mapconcat 'identity
+                     (mapcar (lambda (this-verse)
+                               ;; insert here code to produce an org-element
+                               ;; with the appropriate content for each marked candidate
+                               (concat "** "
+                                       (cdr (assoc 'name this-verse))
+                                       "\n"
+                                       (cdr (assoc 'esv-text this-verse))
+                                       "\n"))
+                             (helm-marked-candidates))
+                     "\n")))
+
 (defvar helm-bible-actions
   (helm-make-actions
    "Display verse" 'helm-bible-action-display-verse
    "Insert verse (text only)" 'helm-bible-action-insert-verse-text
    "Insert verse reference" 'helm-bible-action-insert-reference
    "Insert verse with reference" 'helm-bible-action-insert-verse-with-reference
-   "Goto notes" 'helm-bible-action-goto-notes)
+   "Goto notes" 'helm-bible-action-goto-notes
+   "List selected verses in buffer" 'helm-bible-action-create-buffer)
   "Create the actions for helm-bible.")
 
 (defvar helm-source-bible
