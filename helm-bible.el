@@ -79,6 +79,11 @@ candidates."
                                        (helm-marked-candidates))
                      " ")))
 
+;; [todo] - In order to correctly format the reference, will need to come up
+;; with a clever way of getting all the verses and turning the appropriate one
+;; into a range, rather than listing every verse. But needs to deal with the
+;; cases where verses go over a chapter break or where verses from different
+;; places are given.
 (defun helm-bible-action-insert-reference (verse)
   "Insert the reference of the selected Bible verse at point."
   (insert (cdr (assoc 'name verse))))
