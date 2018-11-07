@@ -140,7 +140,8 @@ candidates."
   "Search the Bible."
   (interactive)
   (helm :sources '(helm-source-bible)
-        :buffer "*helm bible*"))
+        :buffer "*helm bible*"
+        :candidate-number-limit nil))
 
 (provide 'helm-bible)
 ;;; helm-bible ends here
