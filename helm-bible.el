@@ -84,9 +84,104 @@ candidates."
 ;; into a range, rather than listing every verse. But needs to deal with the
 ;; cases where verses go over a chapter break or where verses from different
 ;; places are given.
+(defun helm-bible-format-reference (verse)
+    "Create a reference of the verse and return it as a string"
+    (if (eq (length (nth 1 verse)) 1)
+        (if (eq (length (nth 2 verse )) 1)
+            ;; form of Gen 1:1
+            (format "%s %s:%s"
+                    (nth 0 verse)
+                    (car (nth 1 verse))
+                    (car (nth 2 verse)))
+          ;; form of Gen 1:1-2
+          (format "%s %s:%s-%s"
+                  (nth 0 verse)
+                  (car (nth 1 verse))
+                  (nth 0 (nth 2 verse))
+                  (nth 1 (nth 2 verse))))
+      ;; form of Gen 1:1-2:12
+      (format "%s %s:%s-%s:%s"
+              (nth 0 verse)
+              (nth 0 (nth 1 verse))
+              (nth 0 (nth 2 verse))
+              (nth 1 (nth 1 verse))
+              (nth 1 (nth 2 verse)))))
+
+(defun helm-bible-consolidate-refs (verse1 verse2)
+    "If verse2 immediately follows verse1, return a single reference which is
+amalgamated of the two. Otherwise, return the two verses unchanged."
+    (if ;; same bible book
+        (and (equal (car verse1) (car verse2))
+             ;; chapter numbers same and verse no. successive
+             ;; OR last verse of chapter and first verse of next
+             (or (and (eq (car (last (nth 1 verse1))) (car (nth 1 verse2)))
+                      (eq (+ 1 (car (last (nth 2 verse1))))
+                          (car (nth 2 verse2))))
+                 ;; A speed up: don't look up last verse of this chapter unless
+                 ;; the second verse is first chapter
+                 (and (eq (car (nth 2 verse2)) 1)
+                      (eq (+ 1 (car (last (nth 1 verse1))))
+                          (car (nth 1 verse2)))
+                      (equal (format "%s" (car (last (nth 2 verse1))))
+                          (helm-bible-get-last-verse-of-chap verse1)))))
+        ;; successive, join together
+        (list
+         (car verse1)
+         (if (eq (car (nth 1 verse1)) (car (last (nth 1 verse2))))
+             (nth 1 verse1)
+           (list (car (nth 1 verse1)) (car (last (nth 1 verse2)))))
+         (list (car (nth 2 verse1)) (car (last (nth 2 verse2)))))
+        ;; non-successive, return separately
+        (list verse1 verse2)))
+
+(defun helm-bible-last-verse-to-cons (ref)
+    "Take `ref' and turn it into a cons for lookup in an assoc list"
+    (string-match "\\([A-Za-z0-9 ]+\\) \\([0-9]+\\):\\([0-9]+\\)" ref)
+    (cons (concat (match-string 1 ref) " " (match-string 2 ref))
+          (match-string 3 ref)))
+
+(defun helm-bible-get-last-verse-numbers ()
+    "Get list of last verse numbers for each chapter of Bible"
+    (mapcar 'helm-bible-last-verse-to-cons
+            (with-temp-buffer
+              (insert-file-contents "~/Bible/helm-bible/LastVerse.txt")
+              (split-string (buffer-string) "\n" t))))
+(defun helm-bible-get-last-verse-of-chap (verse)
+    "Given a reference `verse', return the verse number of the final verse of
+the chapter"
+    (cdr (assoc
+          (concat (nth 0 verse) " " (format "%s" (car (last (nth 1 verse)))))
+          (helm-bible-get-last-verse-numbers))))
+
+(defun helm-bible-consolidate-references-list (references-list)
+    "Take a list of single verse references and return a consolidated list"
+    (setq index 0)
+    (while (< index (length references-list))
+      (let ((consolidated-elem
+             (helm-bible-consolidate-refs (nth index references-list)
+                                          (nth (1+ index) references-list))))
+        (if (eq (length consolidated-elem) 3)
+            (progn
+              (setq references-list (-replace-at index consolidated-elem
+                                                 references-list))
+              (setq references-list (-remove-at (1+ index) references-list)))
+          (setq index (1+ index)))))
+    references-list)
+
+(defun helm-bible-verse-to-reference (verse)
+    "Take a `verse' assoc list, as selected by helm-bible, and return a
+reference structure for use in referencing code."
+    (list (cdr (assoc 'book verse))
+          (list (string-to-number (cdr (assoc 'chapter verse))))
+          (list (string-to-number (cdr (assoc 'verse verse))))))
+
 (defun helm-bible-action-insert-reference (verse)
-  "Insert the reference of the selected Bible verse at point."
-  (insert (cdr (assoc 'name verse))))
+  "Insert the reference(s) of the selected Bible verse(s) at point."
+  (insert (mapconcat 'helm-bible-format-reference
+                     (helm-bible-consolidate-references-list
+                      (mapcar 'helm-bible-verse-to-reference
+                              (helm-marked-candidates)))
+                     "; ")))
 
 (defun helm-bible-action-insert-verse-with-reference (verse)
   "Insert the text of the selected Bible verse at point, with a reference."
