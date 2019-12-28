@@ -220,6 +220,10 @@ reference structure for use in referencing code."
                              (helm-marked-candidates))
                      "\n")))
 
+(defun helm-bible-action-selected-candidates (verse)
+  "Insert a list of the selected candidates for use in testing and developing."
+  (insert (mapconcat 'string (helm-marked-candidates) "\n")))
+
 (defvar helm-bible-actions
   (helm-make-actions
    "Display verse" 'helm-bible-action-display-verse
@@ -227,7 +231,8 @@ reference structure for use in referencing code."
    "Insert verse reference" 'helm-bible-action-insert-reference
    "Insert verse with reference" 'helm-bible-action-insert-verse-with-reference
    "Goto notes" 'helm-bible-action-goto-notes
-   "List selected verses in buffer" 'helm-bible-action-create-buffer)
+   "List selected verses in buffer" 'helm-bible-action-create-buffer
+   "Get selected candidates for testing" 'helm-bible-action-selected-candidates)
   "Create the actions for helm-bible.")
 
 (defvar helm-source-bible
