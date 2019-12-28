@@ -84,10 +84,15 @@ candidates."
 ;; into a range, rather than listing every verse. But needs to deal with the
 ;; cases where verses go over a chapter break or where verses from different
 ;; places are given.
+;; Partially completed here! Next step is to combine references which appear in
+;; same book, but aren't immediately successive. Should be relatively simple to
+;; take list of strings and filter before concatination.
+;; Next step after that is to add automatic referencing when inserting verse
+;; text too.
 (defun helm-bible-format-reference (verse)
     "Create a reference of the verse and return it as a string"
-    (if (eq (length (nth 1 verse)) 1)
-        (if (eq (length (nth 2 verse )) 1)
+    (if (= (length (nth 1 verse)) 1)
+        (if (= (length (nth 2 verse )) 1)
             ;; form of Gen 1:1
             (format "%s %s:%s"
                     (nth 0 verse)
@@ -114,20 +119,20 @@ amalgamated of the two. Otherwise, return the two verses unchanged."
         (and (equal (car verse1) (car verse2))
              ;; chapter numbers same and verse no. successive
              ;; OR last verse of chapter and first verse of next
-             (or (and (eq (car (last (nth 1 verse1))) (car (nth 1 verse2)))
-                      (eq (+ 1 (car (last (nth 2 verse1))))
+             (or (and (= (car (last (nth 1 verse1))) (car (nth 1 verse2)))
+                      (= (1+ (car (last (nth 2 verse1))))
                           (car (nth 2 verse2))))
                  ;; A speed up: don't look up last verse of this chapter unless
                  ;; the second verse is first chapter
-                 (and (eq (car (nth 2 verse2)) 1)
-                      (eq (+ 1 (car (last (nth 1 verse1))))
+                 (and (= (car (nth 2 verse2)) 1)
+                      (= (1+ (car (last (nth 1 verse1))))
                           (car (nth 1 verse2)))
                       (equal (format "%s" (car (last (nth 2 verse1))))
                           (helm-bible-get-last-verse-of-chap verse1)))))
         ;; successive, join together
         (list
          (car verse1)
-         (if (eq (car (nth 1 verse1)) (car (last (nth 1 verse2))))
+         (if (= (car (nth 1 verse1)) (car (last (nth 1 verse2))))
              (nth 1 verse1)
            (list (car (nth 1 verse1)) (car (last (nth 1 verse2)))))
          (list (car (nth 2 verse1)) (car (last (nth 2 verse2)))))
