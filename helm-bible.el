@@ -230,10 +230,14 @@ and return a properly formatted text reference"
 
 (defun helm-bible-action-insert-verse-with-reference (verse)
   "Insert the text of the selected Bible verse at point, with a reference."
-  (insert (concat (cdr (assoc 'esv-text verse))
-                  " ("
-                  (cdr (assoc 'name verse))
-                  ")")))
+  (insert (concat
+           (mapconcat 'identity (mapcar (lambda (this-verse)
+                                          (cdr (assoc 'esv-text this-verse)))
+                                        (helm-marked-candidates))
+                      " ")
+           " ("
+           (helm-bible-format-reference (helm-marked-candidates))
+           ")")))
 
 (defun helm-bible-action-goto-notes (verse)
   "Go to notes file and location for notes on that verse."
