@@ -270,10 +270,10 @@ and return a properly formatted text reference"
 
 (defvar helm-bible-actions
   (helm-make-actions
-   "Display verse" 'helm-bible-action-display-verse
-   "Insert verse (text only)" 'helm-bible-action-insert-verse-text
-   "Insert verse reference" 'helm-bible-action-insert-reference
    "Insert verse with reference" 'helm-bible-action-insert-verse-with-reference
+   "Insert verse reference" 'helm-bible-action-insert-reference
+   "Insert verse (text only)" 'helm-bible-action-insert-verse-text
+   "Display verse" 'helm-bible-action-display-verse
    "Goto notes" 'helm-bible-action-goto-notes
    "List selected verses in buffer" 'helm-bible-action-create-buffer
    "Get selected candidates for testing" 'helm-bible-action-selected-candidates)
