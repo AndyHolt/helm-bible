@@ -224,7 +224,7 @@ and return a properly formatted text reference"
                "; "))
 
 ;; Action for inserting references
-(defun helm-bible-action-insert-reference (verse)
+(defun helm-bible-action-insert-reference (verse-list)
   "Insert the reference(s) of the selected Bible verse(s) at point."
   (insert (helm-bible-format-reference (helm-marked-candidates))))
 
