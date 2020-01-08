@@ -79,39 +79,9 @@ candidates."
                                        (helm-marked-candidates))
                      " ")))
 
-;; [todo] - In order to correctly format the reference, will need to come up
-;; with a clever way of getting all the verses and turning the appropriate one
-;; into a range, rather than listing every verse. But needs to deal with the
-;; cases where verses go over a chapter break or where verses from different
-;; places are given.
-;; Partially completed here! Next step is to combine references which appear in
-;; same book, but aren't immediately successive. Should be relatively simple to
-;; take list of strings and filter before concatination.
-;; Next step after that is to add automatic referencing when inserting verse
-;; text too.
-(defun helm-bible-format-reference (verse)
-    "Create a reference of the verse and return it as a string"
-    (if (= (length (nth 1 verse)) 1)
-        (if (= (length (nth 2 verse )) 1)
-            ;; form of Gen 1:1
-            (format "%s %s:%s"
-                    (nth 0 verse)
-                    (car (nth 1 verse))
-                    (car (nth 2 verse)))
-          ;; form of Gen 1:1-2
-          (format "%s %s:%s-%s"
-                  (nth 0 verse)
-                  (car (nth 1 verse))
-                  (nth 0 (nth 2 verse))
-                  (nth 1 (nth 2 verse))))
-      ;; form of Gen 1:1-2:12
-      (format "%s %s:%s-%s:%s"
-              (nth 0 verse)
-              (nth 0 (nth 1 verse))
-              (nth 0 (nth 2 verse))
-              (nth 1 (nth 1 verse))
-              (nth 1 (nth 2 verse)))))
-
+;; Adjacent references should be grouped together into a single reference of the
+;; range. Multiple references from the same chapter and book should be
+;; consolidated so that the book name and chapter number are only given once.
 (defun helm-bible-consolidate-refs (verse1 verse2)
     "If verse2 immediately follows verse1, return a single reference which is
 amalgamated of the two. Otherwise, return the two verses unchanged."
@@ -180,13 +150,83 @@ reference structure for use in referencing code."
           (list (string-to-number (cdr (assoc 'chapter verse))))
           (list (string-to-number (cdr (assoc 'verse verse))))))
 
+(defun helm-bible-group-by-book (the-list)
+    "Take a consolidated verse list and return a list grouped together by book,
+    i.e. the car of the sub-lists, with each subsequent element being
+the cons of one of the original lists."
+    (let ((grouped-list (-group-by 'car the-list)))
+      (-map #'(lambda (grouped-elem)
+                (cons (car grouped-elem)
+                      (-map 'cdr (cdr grouped-elem))))
+            grouped-list)))
+
+(defun helm-bible-group-by-chap (list-in-book)
+  "Take the list of references for a specific Bible book and group them together
+  according to chapter number."
+  (let ((grouped-list (-group-by 'car list-in-book)))
+    (-map #'(lambda (grouped-elem)
+              (cons (car grouped-elem)
+                    (-map 'cadr
+                          (cdr grouped-elem))))
+          grouped-list)))
+
+(defun helm-bible-group-similar-references (verse-list)
+    "Take a list of consolidated bible references (adjacent references joined
+together) and return a list reorganised into a list with each element one bible
+    book, taking a list of all references from that Bible book."
+    (-map #'(lambda (book-group)
+              (cons (car book-group)
+                    (helm-bible-group-by-chap (cdr book-group))))
+          (helm-bible-group-by-book verse-list)))
+
+(defun helm-bible-format-verse-reference (verse-ref)
+    "Take a inidividual verse reference, of either one or two verses and return
+as a string of either a single verse or a range (3 -> 3; 3 5 -> 3-5)"
+    (if (eq (length verse-ref) 1)
+        (format "%s" (car verse-ref))
+      (format "%s-%s"
+              (car verse-ref)
+              (cadr verse-ref))))
+
+(defun helm-bible-format-chapter-references (chap-references)
+    "Take the list of references for a particular chapter and return a formatted
+string."
+    ;; reference(s) within a single chapter
+    (if (eq (length (car chap-references)) 1)
+        (format "%s:%s"
+                (car (car chap-references))
+                (mapconcat 'helm-bible-format-verse-reference
+                           (cdr chap-references)
+                           ", "))
+      ;; reference crossing chapters, e.g. 3:15-4:2
+      (format "%s:%s-%s:%s"
+              (nth 0 (nth 0 chap-references))
+              (nth 0 (nth 1 chap-references))
+              (nth 1 (nth 0 chap-references))
+              (nth 1 (nth 1 chap-references)))))
+
+(defun helm-bible-format-book-reference (book-list)
+    "Take an organised list defining the references of a particular bible book
+and return a properly formatted text reference"
+    (format "%s %s"
+            (car book-list)
+            (mapconcat 'helm-bible-format-chapter-references
+                       (cdr book-list)
+                       "; ")))
+
+(defun helm-bible-format-reference (verse-list)
+    "Take a list of verses from helm selection and return a formatted reference string"
+    (mapconcat 'helm-bible-format-book-reference
+               (helm-bible-group-similar-references
+                (helm-bible-consolidate-references-list
+                 (-map 'helm-bible-verse-to-reference
+                         verse-list)))
+               "; "))
+
+;; Action for inserting references
 (defun helm-bible-action-insert-reference (verse)
   "Insert the reference(s) of the selected Bible verse(s) at point."
-  (insert (mapconcat 'helm-bible-format-reference
-                     (helm-bible-consolidate-references-list
-                      (mapcar 'helm-bible-verse-to-reference
-                              (helm-marked-candidates)))
-                     "; ")))
+  (insert (helm-bible-format-reference (helm-marked-candidates))))
 
 (defun helm-bible-action-insert-verse-with-reference (verse)
   "Insert the text of the selected Bible verse at point, with a reference."
